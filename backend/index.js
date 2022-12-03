@@ -2,17 +2,22 @@
 
 const express = require('express')
 const cors = require('cors')
-const Task = require('./schema/taskschema')
+const Task = require('../frontend/schema/taskschema')
 const mongoose = require('mongoose')
-
+require('dotenv').config
 const app = express()
 app.use(cors())
 app.use(express.json())
-const port = 4000;
+const port = process.env.PORT;
 
 mongoose.connect('mongodb+srv://siri:siri@cluster0.hztdmwa.mongodb.net/list?retryWrites=true&w=majority')
 
 
+app.use(express.static(path.join(__dirname, "/frontend/build")));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '/frontend/build', 'index.html'));
+});
 app.get('/tasks',async(req,res)=>{
     const find = await Task.find()
     res.json(find)
@@ -59,4 +64,4 @@ app.delete('/delete/:id',async(req,res)=>{
 
 
 
-app.listen(port , ()=>{console.log(`running on port ${port}`)})
+app.listen(port || 4000, ()=>{console.log(`running on port ${port}`)})
